@@ -121,9 +121,8 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
                                sparse_output=True, \
                                n_jobs=1, random_state=None )
     
-    ##y_train de mai jos
+    #load train labels
     y_train = pd.read_csv(filetrainlabels)
-    #y_train = y_train.iloc[:,1:]
     
     
     #train the embedding supervised with label as last product - investment funds 
@@ -138,15 +137,15 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
     #transform the float input to sparse vectors with similarity meaning
     X_train_trees = rte.transform(X_train).todense()
     
-    #check the distribution of leafs density
-    #leafs = pd.DataFrame(X_train_trees.sum(axis=0)).values[0]
-    #plt.scatter(range(len(leafs)),leafs)
+    #check the distribution of leaves density
+    #leaves = pd.DataFrame(X_train_trees.sum(axis=0)).values[0]
+    #plt.scatter(range(len(leaves)),leaves)
     
     #compute the length of the embedding, somewhere around 160 but smaller ..
-    nrleafs = int(X_train_trees.shape[1])
+    nrleaves = int(X_train_trees.shape[1])
     
     #train the deep autonecoder to compress the data to a smaller dimension
-    encmodel=encoder_model(nrleafs)
+    encmodel=encoder_model(nrleaves)
     encmodel.fit(X_train_trees, X_train_trees,
               epochs=4,
               batch_size=100)
@@ -158,7 +157,7 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
     #encmodel.summary()
     
     ##build just the encode part by loading half of weights
-    justencmodel = just_encode_model(nrleafs)
+    justencmodel = just_encode_model(nrleaves)
     #justencmodel.summary()
     justencmodel.load_weights(filename, by_name=True)
     justencmodel.save('encoder.hdf5')
@@ -167,7 +166,7 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
     enc_x_train = pd.DataFrame(justencmodel.predict(X_train_trees))
     
     #check that the dimensionality reduction is well distributed 
-    #if some dimensions are zero, try training a new encoder as it depends on random initialization
+    #if some dimensions are constant zero, try training a new encoder as it depends on random initialization
     
     #plt.scatter(range(len(enc_x_train)), enc_x_train.iloc[:,0])
     #plt.scatter(range(len(enc_x_train)), enc_x_train.iloc[:,1])
@@ -195,9 +194,6 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
               batch_size=100)
                    
     model.save('recommender.hdf5')
-    
-    
-    
     
     return "Done"
 
@@ -338,5 +334,6 @@ def test_nn(filetestdata='testset.csv', filetestlabels='testlabels.csv' ):
     score = score_map5('pred-strings-nn.csv', testfile)
     print(score)
     
+    return score
     
    
