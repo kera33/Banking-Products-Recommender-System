@@ -2,7 +2,7 @@
 """
 Created on Wed Mar 28 10:50:34 2018
 
-@author: Kera
+@authors: Horia Velicu, Paula Alexandra Pal
 """
 
 import pandas as pd
@@ -41,9 +41,7 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
     def encoder_model(inputlen):
         #create model
         model = Sequential()
-        # Dense(64) is a fully-connected layer with 64 hidden units.
-        # in the first layer, you must specify the expected input data shape:
-        # here, 20-dimensional vectors.
+        
         model.add(Dense(64, input_dim=inputlen, init='lecun_uniform', name = 'l1')) ##nr samples / input_dim
         model.add(Activation('relu'))
       
@@ -71,6 +69,7 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
         model.add(Dense(64, init='lecun_uniform')) 
         model.add(Activation('relu'))
         
+	#predict the input
         model.add(Dense(inputlen, init='lecun_uniform')) 
         model.add(Activation('linear'))
         #compile model
@@ -99,7 +98,7 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
         model.add(Activation('relu'))
         
         #compile model
-        model.compile(loss='mean_squared_error',optimizer='adam')#top_k_categorical_accuracy(y_true, y_pred, k=7)'])
+        model.compile(loss='mean_squared_error',optimizer='adam')
         return model
 
     
@@ -196,14 +195,12 @@ def train_nn(filetraindata='trainingset.csv', filetrainlabels='traininglabels.cs
               batch_size=100)
                    
     model.save('recommender.hdf5')
-    ##0.9608 la rte funds 20 epochs, 0.9469
-    ##0.64 final cu hinge simplu
+    
     
     
     
     return "Done"
 
-classifiername='nn'
 def test_nn(filetestdata='testset.csv', filetestlabels='testlabels.csv' ):
     
     def create_strings_labels(df, filename):
